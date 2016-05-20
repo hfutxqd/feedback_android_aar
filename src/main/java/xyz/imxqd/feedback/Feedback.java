@@ -23,6 +23,7 @@ import java.io.IOException;
  */
 public class Feedback {
     public static final String SERVER_URL = "http://imxqd.xyz/feedback/index.php?c=api&a=upload";
+    private static final int TIME_OUT = 10000;
 
     private String mDescription, mUserEmail, mUserQQ, mAppTitle, mAppPackage, mAppVersion, mAppAttachment
             , mDeviceImei, mDeviceModel, mSystemVersion;
@@ -40,7 +41,7 @@ public class Feedback {
             this.mAppPackage = ai.packageName;
             this.mAppVersion = info.versionName + ",code:" + info.versionCode;
             this.mAppAttachment = "";
-            this.mDeviceModel = Build.MODEL;
+            this.mDeviceModel = Build.BRAND + " " + Build.MODEL;
             this.mSystemVersion = Build.VERSION.RELEASE + ", API" + Build.VERSION.SDK_INT;
             if(imei)
             {
@@ -129,6 +130,7 @@ public class Feedback {
     private boolean submit() throws IOException {
         Connection connection = Jsoup.connect(SERVER_URL)
                 .ignoreContentType(true)
+                .timeout(TIME_OUT)
                 .data("description", mDescription)
                 .data("user_email", mUserEmail)
                 .data("user_qq", mUserQQ)

@@ -138,7 +138,7 @@ public class Feedback {
                 .data("app_version", mAppVersion)
                 .data("device_imei", mDeviceImei)
                 .data("device_model", mDeviceModel)
-                .data("system_version", mDeviceImei);
+                .data("system_version", mSystemVersion);
 
         if(!mAppAttachment.equals(""))
         {

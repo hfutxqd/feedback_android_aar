@@ -24,120 +24,100 @@ import java.io.IOException;
 public class Feedback {
     public static final String SERVER_URL = "http://imxqd.xyz/feedback/index.php?c=api&a=upload";
 
-    private String description, user_email, user_qq, app_title, app_package, app_version, app_attachment
-            , device_imei, device_model, system_version;
-    private int level = 2;
+    private String mDescription, mUserEmail, mUserQQ, mAppTitle, mAppPackage, mAppVersion, mAppAttachment
+            , mDeviceImei, mDeviceModel, mSystemVersion;
+    private int mLevel = 2;
 
     public Feedback(Context context, boolean imei){
         PackageManager pm = context.getPackageManager();
         try {
             PackageInfo info = pm.getPackageInfo(context.getPackageName(), 0);
             ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), 0);
-            this.description = "";
-            this.user_email = "";
-            this.user_qq = "";
-            this.app_title = (String) pm.getApplicationLabel(ai);
-            this.app_package = ai.packageName;
-            this.app_version = info.versionName + ",code:" + info.versionCode;
-            this.app_attachment = "";
-            this.device_model = Build.MODEL;
-            this.system_version = Build.VERSION.RELEASE + ", API" + Build.VERSION.SDK_INT;
+            this.mDescription = "";
+            this.mUserEmail = "";
+            this.mUserQQ = "";
+            this.mAppTitle = (String) pm.getApplicationLabel(ai);
+            this.mAppPackage = ai.packageName;
+            this.mAppVersion = info.versionName + ",code:" + info.versionCode;
+            this.mAppAttachment = "";
+            this.mDeviceModel = Build.MODEL;
+            this.mSystemVersion = Build.VERSION.RELEASE + ", API" + Build.VERSION.SDK_INT;
             if(imei)
             {
                 TelephonyManager telephonyManager=(TelephonyManager)
                         context.getSystemService(Context.TELEPHONY_SERVICE);
 
-                this.device_imei = telephonyManager.getDeviceId();
+                this.mDeviceImei = telephonyManager.getDeviceId();
             }else {
-                this.device_imei = "";
+                this.mDeviceImei = "";
             }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public Feedback(String description, String user_email, String user_qq, String app_title,
-                    String app_package, String app_version, String app_attachment, String device_imei,
-                    String device_model, String system_version) {
-        this.description = description;
-        this.user_email = user_email;
-        this.user_qq = user_qq;
-        this.app_title = app_title;
-        this.app_package = app_package;
-        this.app_version = app_version;
-        this.app_attachment = app_attachment;
-        this.device_imei = device_imei;
-        this.device_model = device_model;
-        this.system_version = system_version;
+    public Feedback(String mDescription, String mUserEmail, String mUserQQ, String mAppTitle,
+                    String mAppPackage, String mAppVersion, String mAppAttachment, String mDeviceImei,
+                    String mDeviceModel, String mSystemVersion) {
+        this.mDescription = mDescription;
+        this.mUserEmail = mUserEmail;
+        this.mUserQQ = mUserQQ;
+        this.mAppTitle = mAppTitle;
+        this.mAppPackage = mAppPackage;
+        this.mAppVersion = mAppVersion;
+        this.mAppAttachment = mAppAttachment;
+        this.mDeviceImei = mDeviceImei;
+        this.mDeviceModel = mDeviceModel;
+        this.mSystemVersion = mSystemVersion;
     }
 
-    public void setLevel(int level) {
-        this.level = level;
+    public void setLevel(int mLevel) {
+        this.mLevel = mLevel;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescription(String mDescription) {
+        this.mDescription = mDescription;
     }
 
-    public void setUser_email(String user_email) {
-        this.user_email = user_email;
+    public void setUserEmail(String mUserEmail) {
+        this.mUserEmail = mUserEmail;
     }
 
-    public void setUser_qq(String user_qq) {
-        this.user_qq = user_qq;
+    public void setUserQQ(String mUserQQ) {
+        this.mUserQQ = mUserQQ;
     }
 
-    public void setApp_title(String app_title) {
-        this.app_title = app_title;
+    public String getAppPackage() {
+        return mAppPackage;
     }
 
-    public String getApp_package() {
-        return app_package;
+    public String getAppVersion() {
+        return mAppVersion;
     }
 
-    public void setApp_package(String app_package) {
-
-        this.app_package = app_package;
+    public String getAppAttachment() {
+        return mAppAttachment;
     }
 
-    public String getApp_version() {
-        return app_version;
+    public void setAppAttachment(String mAppAttachment) {
+        this.mAppAttachment = mAppAttachment;
     }
 
-    public void setApp_version(String app_version) {
-        this.app_version = app_version;
+    public String getDeviceImei() {
+        return mDeviceImei;
     }
 
-    public String getApp_attachment() {
-        return app_attachment;
+    public void setDeviceImei(String mDeviceImei) {
+        this.mDeviceImei = mDeviceImei;
     }
 
-    public void setApp_attachment(String app_attachment) {
-        this.app_attachment = app_attachment;
+    public String getDeviceModel() {
+        return mDeviceModel;
     }
 
-    public String getDevice_imei() {
-        return device_imei;
-    }
 
-    public void setDevice_imei(String device_imei) {
-        this.device_imei = device_imei;
-    }
-
-    public String getDevice_model() {
-        return device_model;
-    }
-
-    public void setDevice_model(String device_model) {
-        this.device_model = device_model;
-    }
-
-    public String getSystem_version() {
-        return system_version;
-    }
-
-    public void setSystem_version(String system_version) {
-        this.system_version = system_version;
+    public String getSystemVersion() {
+        return mSystemVersion;
     }
 
     public void submit(SubmitCallBack callBack)
@@ -149,20 +129,20 @@ public class Feedback {
     private boolean submit() throws IOException {
         Connection connection = Jsoup.connect(SERVER_URL)
                 .ignoreContentType(true)
-                .data("description", description)
-                .data("user_email", user_email)
-                .data("user_qq", user_qq)
-                .data("level", String.valueOf(level))
-                .data("app_title", app_title)
-                .data("app_package", app_package)
-                .data("app_version", app_version)
-                .data("device_imei", device_imei)
-                .data("device_model", device_model)
-                .data("system_version", device_imei);
+                .data("description", mDescription)
+                .data("user_email", mUserEmail)
+                .data("user_qq", mUserQQ)
+                .data("level", String.valueOf(mLevel))
+                .data("app_title", mAppTitle)
+                .data("app_package", mAppPackage)
+                .data("app_version", mAppVersion)
+                .data("device_imei", mDeviceImei)
+                .data("device_model", mDeviceModel)
+                .data("system_version", mDeviceImei);
 
-        if(!app_attachment.equals(""))
+        if(!mAppAttachment.equals(""))
         {
-            File file = new File(app_attachment);
+            File file = new File(mAppAttachment);
             connection.data("app_attachment", file.getName(), new FileInputStream(file));
         }
         String json = connection.post().text();
@@ -178,17 +158,17 @@ public class Feedback {
     @Override
     public String toString() {
         return "Feedback{" +
-                "description='" + description + '\'' +
-                ", user_email='" + user_email + '\'' +
-                ", user_qq='" + user_qq + '\'' +
-                ", app_title='" + app_title + '\'' +
-                ", app_package='" + app_package + '\'' +
-                ", app_version='" + app_version + '\'' +
-                ", app_attachment='" + app_attachment + '\'' +
-                ", device_imei='" + device_imei + '\'' +
-                ", device_model='" + device_model + '\'' +
-                ", system_version='" + system_version + '\'' +
-                ", level=" + level +
+                "mDescription='" + mDescription + '\'' +
+                ", mUserEmail='" + mUserEmail + '\'' +
+                ", mUserQQ='" + mUserQQ + '\'' +
+                ", mAppTitle='" + mAppTitle + '\'' +
+                ", mAppPackage='" + mAppPackage + '\'' +
+                ", mAppVersion='" + mAppVersion + '\'' +
+                ", mAppAttachment='" + mAppAttachment + '\'' +
+                ", mDeviceImei='" + mDeviceImei + '\'' +
+                ", mDeviceModel='" + mDeviceModel + '\'' +
+                ", mSystemVersion='" + mSystemVersion + '\'' +
+                ", mLevel=" + mLevel +
                 '}';
     }
 

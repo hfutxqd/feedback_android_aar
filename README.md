@@ -5,7 +5,7 @@ feedback反馈类库
 
     Feedback feedback = new Feedback(this, false);
     feedback.setDescription("这是描述");
-    feedback.setUser_email("me@imxqd.xyz");
+    feedback.setUserMail("me@imxqd.xyz");
     // ... 
     feedback.submit(new Feedback.SubmitCallBack() {
          @Override

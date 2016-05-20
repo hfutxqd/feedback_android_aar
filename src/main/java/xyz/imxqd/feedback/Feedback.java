@@ -1,8 +1,10 @@
 package xyz.imxqd.feedback;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
@@ -30,11 +32,12 @@ public class Feedback {
         PackageManager pm = context.getPackageManager();
         try {
             PackageInfo info = pm.getPackageInfo(context.getPackageName(), 0);
+            ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), 0);
             this.description = "";
             this.user_email = "";
             this.user_qq = "";
-            this.app_title = context.getApplicationInfo().name;
-            this.app_package = context.getApplicationInfo().packageName;
+            this.app_title = (String) pm.getApplicationLabel(ai);
+            this.app_package = ai.packageName;
             this.app_version = info.versionName + ",code:" + info.versionCode;
             this.app_attachment = "";
             this.device_model = Build.MODEL;
@@ -137,8 +140,15 @@ public class Feedback {
         this.system_version = system_version;
     }
 
-    public boolean submit() throws IOException {
+    public void submit(SubmitCallBack callBack)
+    {
+        FeedbackTask task = new FeedbackTask(callBack);
+        task.execute();
+    }
+
+    private boolean submit() throws IOException {
         Connection connection = Jsoup.connect(SERVER_URL)
+                .ignoreContentType(true)
                 .data("description", description)
                 .data("user_email", user_email)
                 .data("user_qq", user_qq)
@@ -150,7 +160,7 @@ public class Feedback {
                 .data("device_model", device_model)
                 .data("system_version", device_imei);
 
-        if(app_attachment != null)
+        if(!app_attachment.equals(""))
         {
             File file = new File(app_attachment);
             connection.data("app_attachment", file.getName(), new FileInputStream(file));
@@ -163,5 +173,59 @@ public class Feedback {
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Feedback{" +
+                "description='" + description + '\'' +
+                ", user_email='" + user_email + '\'' +
+                ", user_qq='" + user_qq + '\'' +
+                ", app_title='" + app_title + '\'' +
+                ", app_package='" + app_package + '\'' +
+                ", app_version='" + app_version + '\'' +
+                ", app_attachment='" + app_attachment + '\'' +
+                ", device_imei='" + device_imei + '\'' +
+                ", device_model='" + device_model + '\'' +
+                ", system_version='" + system_version + '\'' +
+                ", level=" + level +
+                '}';
+    }
+
+    public interface SubmitCallBack{
+        boolean onPreSubmit();
+        void onSubmitted(boolean result);
+    }
+
+    private class FeedbackTask extends AsyncTask<Void, Void, Boolean>
+    {
+        private SubmitCallBack callBack;
+        public FeedbackTask(SubmitCallBack callBack) {
+            this.callBack = callBack;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            System.out.println(Feedback.this);
+            if(!callBack.onPreSubmit())
+            {
+                this.cancel(true);
+            }
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                return submit();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            callBack.onSubmitted(aBoolean);
+        }
     }
 }
